@@ -29,6 +29,40 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function splitFileName(fileName) {
+  const dotIndex = fileName.lastIndexOf(".");
+
+  if (dotIndex <= 0) {
+    return { base: fileName, extension: "" };
+  }
+
+  return {
+    base: fileName.slice(0, dotIndex),
+    extension: fileName.slice(dotIndex)
+  };
+}
+
+function buildUploadName(originalName, customName) {
+  const trimmedName = customName.trim();
+
+  if (!trimmedName) return originalName;
+
+  const { extension } = splitFileName(originalName);
+  const customBase = extension && trimmedName.toLowerCase().endsWith(extension.toLowerCase())
+    ? trimmedName.slice(0, -extension.length).trim()
+    : trimmedName;
+
+  return `${customBase || splitFileName(originalName).base}${extension}`;
+}
+
+function renameFile(file, fileName) {
+  if (file.name === fileName) return file;
+  return new File([file], fileName, {
+    type: file.type,
+    lastModified: file.lastModified
+  });
+}
+
 async function driveRequest(path, token, options = {}) {
   const response = await fetch(path, {
     ...options,
@@ -122,6 +156,8 @@ export default function App() {
   const [status, setStatus] = useState("");
   const [manualCopy, setManualCopy] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [attachmentName, setAttachmentName] = useState("");
   const [error, setError] = useState("");
   const tokenClientRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -162,7 +198,8 @@ export default function App() {
     }
   }, []);
 
-  const canUpload = useMemo(() => token && !isUploading, [token, isUploading]);
+  const canSelectFile = useMemo(() => token && !isUploading, [token, isUploading]);
+  const finalUploadName = selectedFile ? buildUploadName(selectedFile.name, attachmentName) : "";
 
   function signIn() {
     setError("");
@@ -186,19 +223,30 @@ export default function App() {
     event.target.value = "";
     if (!file) return;
 
+    setSelectedFile(file);
+    setAttachmentName("");
+    setError("");
+    setManualCopy(false);
+    setStatus("");
+  }
+
+  async function handleUploadSelectedFile() {
+    if (!selectedFile) return;
+
     setIsUploading(true);
     setError("");
     setManualCopy(false);
     setStatus("Caricamento in corso...");
 
     try {
+      const fileForDrive = renameFile(selectedFile, finalUploadName);
       const folderId = await findOrCreateFolder(token);
-      const uploaded = await uploadFileToDrive(file, token, folderId);
+      const uploaded = await uploadFileToDrive(fileForDrive, token, folderId);
       await makeFileShareable(uploaded.id, token);
 
       const item = {
         id: uploaded.id,
-        name: uploaded.name || file.name,
+        name: uploaded.name || fileForDrive.name,
         link: uploaded.webViewLink || `https://drive.google.com/file/d/${uploaded.id}/view`,
         uploadedAt: uploaded.createdTime || new Date().toISOString()
       };
@@ -208,6 +256,8 @@ export default function App() {
       setLatestFile(item);
       setHistory(nextHistory);
       saveHistory(nextHistory);
+      setSelectedFile(null);
+      setAttachmentName("");
       setManualCopy(!copied);
       setStatus(copied ? "Link copiato. Ora puoi incollarlo in Fantastical." : "Link pronto. Copialo con il pulsante qui sotto.");
     } catch (uploadError) {
@@ -272,7 +322,7 @@ export default function App() {
               <button
                 className="primary-button"
                 type="button"
-                disabled={!canUpload}
+                disabled={!canSelectFile}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <FileUp size={26} />
@@ -281,13 +331,41 @@ export default function App() {
               <button
                 className="secondary-button"
                 type="button"
-                disabled={!canUpload}
+                disabled={!canSelectFile}
                 onClick={() => photoInputRef.current?.click()}
               >
                 <Camera size={22} />
                 Foto o galleria
               </button>
             </div>
+
+            {selectedFile ? (
+              <div className="rename-box">
+                <div className="original-file">
+                  <span>File selezionato</span>
+                  <strong>{selectedFile.name}</strong>
+                </div>
+                <label htmlFor="attachment-name">Nome allegato</label>
+                <input
+                  id="attachment-name"
+                  type="text"
+                  value={attachmentName}
+                  onChange={(event) => setAttachmentName(event.target.value)}
+                  placeholder={splitFileName(selectedFile.name).base}
+                  autoComplete="off"
+                />
+                <p className="final-name">{finalUploadName}</p>
+                <button
+                  className="primary-button upload-confirm"
+                  type="button"
+                  disabled={isUploading}
+                  onClick={handleUploadSelectedFile}
+                >
+                  <FileUp size={24} />
+                  {isUploading ? "Caricamento..." : "Carica su Drive"}
+                </button>
+              </div>
+            ) : null}
           </>
         )}
 
