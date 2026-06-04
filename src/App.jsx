@@ -5,6 +5,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
 const ATTACHMENTS_FOLDER = "BellaVita Calendario Allegati";
 const HISTORY_KEY = "bellavita-linkbox-history";
+const GOOGLE_AUTH_HINT_KEY = "bellavita-linkbox-google-auth";
 const FANTASTICAL_URL = "x-fantastical3://";
 
 function readHistory() {
@@ -159,6 +160,7 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [attachmentName, setAttachmentName] = useState("");
   const [error, setError] = useState("");
+  const hasRequestedSilentLoginRef = useRef(false);
   const tokenClientRef = useRef(null);
   const fileInputRef = useRef(null);
   const photoInputRef = useRef(null);
@@ -176,11 +178,20 @@ export default function App() {
         callback: (response) => {
           if (response.access_token) {
             setToken(response.access_token);
+            localStorage.setItem(GOOGLE_AUTH_HINT_KEY, "yes");
             setError("");
             setStatus("Accesso Google completato.");
+          } else if (response.error) {
+            localStorage.removeItem(GOOGLE_AUTH_HINT_KEY);
           }
         }
       });
+
+      if (!hasRequestedSilentLoginRef.current && localStorage.getItem(GOOGLE_AUTH_HINT_KEY) === "yes") {
+        hasRequestedSilentLoginRef.current = true;
+        tokenClientRef.current.requestAccessToken({ prompt: "" });
+      }
+
       return true;
     };
 
@@ -214,6 +225,7 @@ export default function App() {
     if (token && window.google?.accounts?.oauth2) {
       window.google.accounts.oauth2.revoke(token, () => {});
     }
+    localStorage.removeItem(GOOGLE_AUTH_HINT_KEY);
     setToken("");
     setStatus("");
   }
