@@ -295,33 +295,41 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="topbar" aria-label="Stato account">
-        <div className="brand-mark">BV</div>
+      <header className="app-header">
+        <section className="topbar" aria-label="Stato account">
+          <div className="brand-lockup">
+            <div className="brand-mark">BV</div>
+            <div>
+              <p className="brand-name">LinkBox</p>
+              <p className="brand-subtitle">Mini Drive personale</p>
+            </div>
+          </div>
+          {token ? (
+            <button className="ghost-button" type="button" onClick={signOut}>
+              <LogOut size={16} />
+              Esci
+            </button>
+          ) : (
+            <button className="ghost-button" type="button" onClick={signIn}>
+              <LogIn size={16} />
+              Google
+            </button>
+          )}
+        </section>
+
+        <button
+          className="drop-zone"
+          type="button"
+          disabled={token ? !canSelectFile : false}
+          onClick={() => (token ? fileInputRef.current?.click() : signIn())}
+        >
+          <FileUp size={28} />
+          <span>Trascina qui il file</span>
+          <small>{token ? "oppure tocca per scegliere un allegato" : "accedi con Google per iniziare"}</small>
+          <b>Link condivisibile in 1 clic</b>
+        </button>
+
         {token ? (
-          <button className="ghost-button" type="button" onClick={signOut}>
-            <LogOut size={18} />
-            Esci
-          </button>
-        ) : (
-          <button className="ghost-button" type="button" onClick={signIn}>
-            <LogIn size={18} />
-            Google
-          </button>
-        )}
-      </section>
-
-      <section className="hero">
-        <p className="eyebrow">Mini Drive personale</p>
-        <h1>BellaVita LinkBox</h1>
-      </section>
-
-      <section className="upload-panel" aria-label="Caricamento allegato">
-        {!token ? (
-          <button className="primary-button" type="button" onClick={signIn}>
-            <LogIn size={24} />
-            Login con Google
-          </button>
-        ) : (
           <>
             <input
               ref={fileInputRef}
@@ -337,59 +345,76 @@ export default function App() {
               onChange={handleFileSelected}
               accept="image/*"
             />
-            <div className={`rename-box ${selectedFile ? "is-ready" : "is-empty"}`}>
-              <p className="selected-file-name">
-                File selezionato: <strong>{selectedFile ? selectedFile.name : "nessun file"}</strong>
-              </p>
-              <label htmlFor="attachment-name">Nome allegato (facoltativo)</label>
-              <input
-                id="attachment-name"
-                type="text"
-                value={attachmentName}
-                onChange={(event) => setAttachmentName(event.target.value)}
-                placeholder={selectedFile ? splitFileName(selectedFile.name).base : "Scegli prima un file"}
-                autoComplete="off"
-                disabled={!selectedFile || isUploading}
-              />
-              <p className="final-name">
-                Nome finale: {selectedFile ? finalUploadName : "seleziona un file o una foto"}
-              </p>
-              <button
-                className="primary-button upload-confirm"
-                type="button"
-                disabled={!selectedFile || isUploading}
-                onClick={handleUploadSelectedFile}
-              >
-                <FileUp size={24} />
-                {isUploading ? "Caricamento..." : "Carica su Drive"}
-              </button>
-            </div>
             <div className="upload-actions">
               <button
-                className="primary-button"
+                className="quick-action-button"
                 type="button"
                 disabled={!canSelectFile}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <FileUp size={26} />
-                {isUploading ? "Caricamento..." : "Carica allegato"}
+                <FileUp size={17} />
+                Carica allegato
               </button>
               <button
-                className="secondary-button"
+                className="quick-action-button"
                 type="button"
                 disabled={!canSelectFile}
                 onClick={() => photoInputRef.current?.click()}
               >
-                <Camera size={22} />
+                <Camera size={17} />
                 Foto o galleria
               </button>
             </div>
           </>
-        )}
+        ) : null}
+      </header>
 
-        {status ? <p className="status-message">{status}</p> : null}
-        {error ? <p className="error-message">{error}</p> : null}
-      </section>
+      {!token ? (
+        <section className="login-card">
+          <button className="primary-button" type="button" onClick={signIn}>
+            <LogIn size={18} />
+            Login con Google
+          </button>
+        </section>
+      ) : (
+        <section className="selected-file-bar" aria-label="File selezionato">
+          <div className="file-type-icon">
+            <FileUp size={18} />
+          </div>
+          <div className="selected-file-content">
+            <p className="selected-file-name">
+              {selectedFile ? selectedFile.name : "Nessun file selezionato"}
+            </p>
+            <p className="selected-file-hint">
+              {selectedFile ? "Puoi rinominare prima dell'upload" : "Scegli un allegato o una foto"}
+            </p>
+            <label htmlFor="attachment-name">Nome allegato (facoltativo)</label>
+            <input
+              id="attachment-name"
+              type="text"
+              value={attachmentName}
+              onChange={(event) => setAttachmentName(event.target.value)}
+              placeholder={selectedFile ? splitFileName(selectedFile.name).base : "Scegli prima un file"}
+              autoComplete="off"
+              disabled={!selectedFile || isUploading}
+            />
+            <p className="final-name">
+              {selectedFile ? `Nome finale: ${finalUploadName}` : "Nome finale: seleziona un file o una foto"}
+            </p>
+          </div>
+          <button
+            className="selected-upload-button"
+            type="button"
+            disabled={!selectedFile || isUploading}
+            onClick={handleUploadSelectedFile}
+          >
+            {isUploading ? "Carico" : "Upload"}
+          </button>
+        </section>
+      )}
+
+      {status ? <p className="toast-message">{status}</p> : null}
+      {error ? <p className="toast-message error-message">{error}</p> : null}
 
       {latestFile ? (
         <section className="link-box" aria-label="Ultimo link generato">
@@ -410,11 +435,17 @@ export default function App() {
       ) : null}
 
       <section className="history-section" aria-label="Ultimi allegati">
-        <h2>Ultimi allegati</h2>
+        <div className="section-header">
+          <h2>Ultimi allegati</h2>
+          <span>{history.length}</span>
+        </div>
         {history.length ? (
           <ul className="history-list">
             {history.map((item) => (
               <li key={item.id}>
+                <div className="history-file-icon">
+                  <FileUp size={17} />
+                </div>
                 <div className="file-info">
                   <span>{item.name}</span>
                   <time dateTime={item.uploadedAt}>{formatDate(item.uploadedAt)}</time>
