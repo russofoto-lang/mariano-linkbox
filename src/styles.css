@@ -33,6 +33,31 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button,
+a {
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    opacity 120ms ease;
+}
+
+button:not(:disabled):active,
+a:active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(1.08);
+}
+
+button:not(:disabled):focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(228, 162, 47, 0.38);
+  outline-offset: 2px;
+}
+
 .app-shell {
   width: min(100%, 520px);
   min-height: 100vh;
@@ -146,6 +171,16 @@ h2 {
   box-shadow: 0 12px 24px rgba(107, 68, 10, 0.16);
 }
 
+.primary-button:not(:disabled):hover {
+  background: #ebb24a;
+  box-shadow: 0 10px 20px rgba(107, 68, 10, 0.2);
+}
+
+.primary-button:not(:disabled):active {
+  background: #f0bd5a;
+  box-shadow: 0 5px 12px rgba(107, 68, 10, 0.16);
+}
+
 .secondary-button {
   min-height: 50px;
   border: 1px solid rgba(15, 66, 56, 0.16);
@@ -153,6 +188,15 @@ h2 {
   color: #0f4238;
   font-size: 0.96rem;
   box-shadow: 0 8px 18px rgba(19, 37, 32, 0.05);
+}
+
+.secondary-button:not(:disabled):hover,
+.ghost-button:not(:disabled):hover,
+.history-actions button:not(:disabled):hover,
+.history-actions a:hover {
+  background: #ffffff;
+  border-color: rgba(15, 66, 56, 0.24);
+  box-shadow: 0 10px 20px rgba(19, 37, 32, 0.08);
 }
 
 .primary-button:disabled,
@@ -234,6 +278,20 @@ h2 {
   background: #0f4238;
   color: #fff8e7;
   box-shadow: 0 12px 24px rgba(15, 66, 56, 0.16);
+}
+
+.upload-confirm:not(:disabled):hover,
+.action-row button:not(:disabled):hover,
+.action-row a:hover {
+  background: #155548;
+  box-shadow: 0 10px 20px rgba(15, 66, 56, 0.2);
+}
+
+.upload-confirm:not(:disabled):active,
+.action-row button:not(:disabled):active,
+.action-row a:active {
+  background: #1a6353;
+  box-shadow: 0 5px 12px rgba(15, 66, 56, 0.16);
 }
 
 .status-message,
@@ -365,6 +423,11 @@ textarea {
 .history-actions .delete-history-button {
   border-color: rgba(159, 46, 34, 0.24);
   color: #9f2e22;
+}
+
+.history-actions .delete-history-button:not(:disabled):hover {
+  background: #fff3f1;
+  border-color: rgba(159, 46, 34, 0.34);
 }
 
 @media (min-width: 700px) {
