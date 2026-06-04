@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
   font-family: "Avenir Next", "Segoe UI", sans-serif;
-  background: #f6f3ea;
-  color: #11231f;
+  background: #f7f8f4;
+  color: #13211f;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,9 +17,8 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    linear-gradient(135deg, rgba(15, 66, 56, 0.1), transparent 34%),
-    radial-gradient(circle at 90% 15%, rgba(216, 154, 56, 0.22), transparent 28%),
-    #f6f3ea;
+    linear-gradient(180deg, #f9faf6 0%, #eef3ed 100%),
+    #f7f8f4;
 }
 
 button,
@@ -38,7 +37,7 @@ a {
   width: min(100%, 520px);
   min-height: 100vh;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom));
+  padding: max(14px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -50,14 +49,15 @@ a {
 
 .brand-mark {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   place-items: center;
-  border-radius: 8px;
-  background: #0f4238;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #0f4b42, #0a302c);
   color: #fff8e7;
   font-weight: 800;
   letter-spacing: 0;
+  box-shadow: 0 10px 22px rgba(15, 66, 56, 0.18);
 }
 
 .ghost-button,
@@ -67,12 +67,13 @@ a {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 42px;
-  border: 1px solid rgba(17, 35, 31, 0.18);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.62);
+  min-height: 40px;
+  border: 1px solid rgba(17, 35, 31, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.84);
   color: #17352f;
   text-decoration: none;
+  box-shadow: 0 8px 18px rgba(19, 37, 32, 0.06);
 }
 
 .ghost-button {
@@ -80,14 +81,15 @@ a {
 }
 
 .hero {
-  padding: 34px 0 24px;
+  padding: 18px 0 14px;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #8b5d18;
-  font-size: 0.84rem;
+  color: #9a6a18;
+  font-size: 0.72rem;
   font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -98,25 +100,25 @@ p {
 }
 
 h1 {
-  max-width: 10ch;
+  max-width: none;
   margin-bottom: 0;
   color: #0f4238;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 3.2rem;
-  line-height: 0.92;
+  font-size: 2.55rem;
+  line-height: 0.95;
   letter-spacing: 0;
 }
 
 h2 {
-  margin-bottom: 14px;
-  font-size: 1.1rem;
+  margin-bottom: 10px;
+  font-size: 1rem;
   letter-spacing: 0;
 }
 
 .upload-panel,
 .link-box,
 .history-section {
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
 .upload-actions {
@@ -130,26 +132,27 @@ h2 {
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 14px;
   font-weight: 900;
 }
 
 .primary-button {
-  min-height: 76px;
-  background: #d89a38;
+  min-height: 58px;
+  background: #e4a22f;
   color: #1d170b;
-  font-size: 1.18rem;
-  box-shadow: 0 16px 34px rgba(107, 68, 10, 0.22);
+  font-size: 1.02rem;
+  box-shadow: 0 12px 24px rgba(107, 68, 10, 0.16);
 }
 
 .secondary-button {
-  min-height: 56px;
-  border: 1px solid rgba(15, 66, 56, 0.24);
-  background: rgba(255, 255, 255, 0.72);
+  min-height: 50px;
+  border: 1px solid rgba(15, 66, 56, 0.16);
+  background: rgba(255, 255, 255, 0.9);
   color: #0f4238;
-  font-size: 1rem;
+  font-size: 0.96rem;
+  box-shadow: 0 8px 18px rgba(19, 37, 32, 0.05);
 }
 
 .primary-button:disabled,
@@ -164,36 +167,36 @@ h2 {
 
 .rename-box {
   display: grid;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 14px;
-  border: 2px solid rgba(216, 154, 56, 0.48);
-  border-radius: 8px;
-  background: #fffaf0;
-  box-shadow: 0 14px 28px rgba(107, 68, 10, 0.12);
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid rgba(15, 66, 56, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 28px rgba(19, 37, 32, 0.08);
 }
 
 .rename-box.is-empty {
-  border-color: rgba(15, 66, 56, 0.2);
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: none;
+  border-color: rgba(15, 66, 56, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 18px rgba(19, 37, 32, 0.04);
 }
 
 .rename-box.is-ready {
-  border-color: rgba(216, 154, 56, 0.68);
+  border-color: rgba(228, 162, 47, 0.54);
 }
 
 .rename-box label,
 .final-name {
   color: #61716d;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
 .selected-file-name {
   margin: 0;
   color: #16332e;
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   line-height: 1.35;
 }
 
@@ -206,11 +209,11 @@ h2 {
 
 .rename-box input {
   width: 100%;
-  min-height: 48px;
-  border: 1px solid rgba(17, 35, 31, 0.18);
-  border-radius: 8px;
+  min-height: 44px;
+  border: 1px solid rgba(17, 35, 31, 0.14);
+  border-radius: 12px;
   padding: 0 12px;
-  background: #fffdf7;
+  background: #fbfcf8;
   color: #16332e;
 }
 
@@ -226,8 +229,11 @@ h2 {
 }
 
 .upload-confirm {
-  min-height: 58px;
+  min-height: 52px;
   margin-top: 2px;
+  background: #0f4238;
+  color: #fff8e7;
+  box-shadow: 0 12px 24px rgba(15, 66, 56, 0.16);
 }
 
 .status-message,
@@ -235,7 +241,7 @@ h2 {
 .manual-copy,
 .empty-state {
   margin: 12px 0 0;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   line-height: 1.45;
 }
 
@@ -250,11 +256,11 @@ h2 {
 }
 
 .link-box {
-  padding: 14px;
-  border: 1px solid rgba(17, 35, 31, 0.14);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 12px 30px rgba(19, 37, 32, 0.08);
+  padding: 12px;
+  border: 1px solid rgba(17, 35, 31, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 28px rgba(19, 37, 32, 0.07);
 }
 
 .link-box label {
@@ -268,10 +274,10 @@ h2 {
 textarea {
   width: 100%;
   resize: none;
-  border: 1px solid rgba(17, 35, 31, 0.18);
-  border-radius: 8px;
+  border: 1px solid rgba(17, 35, 31, 0.14);
+  border-radius: 12px;
   padding: 12px;
-  background: #fffdf7;
+  background: #fbfcf8;
   color: #16332e;
   line-height: 1.35;
 }
@@ -286,12 +292,12 @@ textarea {
 .action-row button,
 .action-row a {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #0f4238;
   color: #fff8e7;
   font-weight: 850;
@@ -299,7 +305,7 @@ textarea {
 }
 
 .history-section {
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 .history-list {
@@ -313,13 +319,14 @@ textarea {
 .history-list li {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
-  min-height: 68px;
-  padding: 12px;
-  border: 1px solid rgba(17, 35, 31, 0.12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.68);
+  min-height: 62px;
+  padding: 10px;
+  border: 1px solid rgba(17, 35, 31, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(19, 37, 32, 0.04);
 }
 
 .file-info {
@@ -329,7 +336,8 @@ textarea {
 .file-info span {
   display: block;
   overflow: hidden;
-  font-weight: 800;
+  font-weight: 850;
+  font-size: 0.95rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -343,21 +351,28 @@ textarea {
 
 .history-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .history-actions button,
 .history-actions a {
-  width: 42px;
+  width: 38px;
+  min-height: 38px;
+  border-radius: 12px;
   padding: 0;
+}
+
+.history-actions .delete-history-button {
+  border-color: rgba(159, 46, 34, 0.24);
+  color: #9f2e22;
 }
 
 @media (min-width: 700px) {
   .app-shell {
-    padding-top: 34px;
+    padding-top: 22px;
   }
 
   h1 {
-    font-size: 3.7rem;
+    font-size: 2.9rem;
   }
 }

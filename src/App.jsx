@@ -1,4 +1,4 @@
-import { Camera, Copy, ExternalLink, FileUp, LogIn, LogOut } from "lucide-react";
+import { Camera, Copy, ExternalLink, FileUp, LogIn, LogOut, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -274,6 +274,13 @@ export default function App() {
     setStatus(copied ? "Link copiato. Ora puoi incollarlo in Fantastical." : "Copia manualmente il link dal campo.");
   }
 
+  function handleRemoveFromHistory(fileId) {
+    const nextHistory = history.filter((item) => item.id !== fileId);
+    setHistory(nextHistory);
+    saveHistory(nextHistory);
+    setStatus("Allegato rimosso dall'elenco. Il file resta su Google Drive.");
+  }
+
   return (
     <main className="app-shell">
       <section className="topbar" aria-label="Stato account">
@@ -407,6 +414,14 @@ export default function App() {
                   <a href={item.link} target="_blank" rel="noreferrer" aria-label={`Apri ${item.name}`}>
                     <ExternalLink size={18} />
                   </a>
+                  <button
+                    className="delete-history-button"
+                    type="button"
+                    aria-label={`Rimuovi ${item.name} dall'elenco`}
+                    onClick={() => handleRemoveFromHistory(item.id)}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </li>
             ))}
