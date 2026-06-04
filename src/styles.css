@@ -164,21 +164,15 @@ h2 {
 
 .rename-box {
   display: grid;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid rgba(17, 35, 31, 0.14);
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 2px solid rgba(216, 154, 56, 0.48);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
+  background: #fffaf0;
+  box-shadow: 0 14px 28px rgba(107, 68, 10, 0.12);
 }
 
-.original-file {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.original-file span,
 .rename-box label,
 .final-name {
   color: #61716d;
@@ -186,12 +180,18 @@ h2 {
   font-weight: 800;
 }
 
-.original-file strong {
-  overflow: hidden;
+.selected-file-name {
+  margin: 0;
   color: #16332e;
   font-size: 0.98rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
+}
+
+.selected-file-name strong {
+  display: inline;
+  overflow: hidden;
+  color: #16332e;
+  overflow-wrap: anywhere;
 }
 
 .rename-box input {
@@ -207,6 +207,7 @@ h2 {
 .final-name {
   overflow-wrap: anywhere;
   margin: -2px 0 0;
+  color: #8b5d18;
 }
 
 .upload-confirm {

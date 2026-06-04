@@ -227,7 +227,7 @@ export default function App() {
     setAttachmentName("");
     setError("");
     setManualCopy(false);
-    setStatus("");
+    setStatus("File selezionato. Puoi rinominarlo o caricarlo subito.");
   }
 
   async function handleUploadSelectedFile() {
@@ -341,11 +341,10 @@ export default function App() {
 
             {selectedFile ? (
               <div className="rename-box">
-                <div className="original-file">
-                  <span>File selezionato</span>
-                  <strong>{selectedFile.name}</strong>
-                </div>
-                <label htmlFor="attachment-name">Nome allegato</label>
+                <p className="selected-file-name">
+                  File selezionato: <strong>{selectedFile.name}</strong>
+                </p>
+                <label htmlFor="attachment-name">Nome allegato (facoltativo)</label>
                 <input
                   id="attachment-name"
                   type="text"
@@ -354,7 +353,7 @@ export default function App() {
                   placeholder={splitFileName(selectedFile.name).base}
                   autoComplete="off"
                 />
-                <p className="final-name">{finalUploadName}</p>
+                <p className="final-name">Nome finale: {finalUploadName}</p>
                 <button
                   className="primary-button upload-confirm"
                   type="button"
