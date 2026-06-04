@@ -318,6 +318,33 @@ export default function App() {
               onChange={handleFileSelected}
               accept="image/*"
             />
+            <div className={`rename-box ${selectedFile ? "is-ready" : "is-empty"}`}>
+              <p className="selected-file-name">
+                File selezionato: <strong>{selectedFile ? selectedFile.name : "nessun file"}</strong>
+              </p>
+              <label htmlFor="attachment-name">Nome allegato (facoltativo)</label>
+              <input
+                id="attachment-name"
+                type="text"
+                value={attachmentName}
+                onChange={(event) => setAttachmentName(event.target.value)}
+                placeholder={selectedFile ? splitFileName(selectedFile.name).base : "Scegli prima un file"}
+                autoComplete="off"
+                disabled={!selectedFile || isUploading}
+              />
+              <p className="final-name">
+                Nome finale: {selectedFile ? finalUploadName : "seleziona un file o una foto"}
+              </p>
+              <button
+                className="primary-button upload-confirm"
+                type="button"
+                disabled={!selectedFile || isUploading}
+                onClick={handleUploadSelectedFile}
+              >
+                <FileUp size={24} />
+                {isUploading ? "Caricamento..." : "Carica su Drive"}
+              </button>
+            </div>
             <div className="upload-actions">
               <button
                 className="primary-button"
@@ -338,33 +365,6 @@ export default function App() {
                 Foto o galleria
               </button>
             </div>
-
-            {selectedFile ? (
-              <div className="rename-box">
-                <p className="selected-file-name">
-                  File selezionato: <strong>{selectedFile.name}</strong>
-                </p>
-                <label htmlFor="attachment-name">Nome allegato (facoltativo)</label>
-                <input
-                  id="attachment-name"
-                  type="text"
-                  value={attachmentName}
-                  onChange={(event) => setAttachmentName(event.target.value)}
-                  placeholder={splitFileName(selectedFile.name).base}
-                  autoComplete="off"
-                />
-                <p className="final-name">Nome finale: {finalUploadName}</p>
-                <button
-                  className="primary-button upload-confirm"
-                  type="button"
-                  disabled={isUploading}
-                  onClick={handleUploadSelectedFile}
-                >
-                  <FileUp size={24} />
-                  {isUploading ? "Caricamento..." : "Carica su Drive"}
-                </button>
-              </div>
-            ) : null}
           </>
         )}
 

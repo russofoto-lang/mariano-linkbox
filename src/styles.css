@@ -165,12 +165,22 @@ h2 {
 .rename-box {
   display: grid;
   gap: 12px;
-  margin-top: 14px;
+  margin-bottom: 12px;
   padding: 14px;
   border: 2px solid rgba(216, 154, 56, 0.48);
   border-radius: 8px;
   background: #fffaf0;
   box-shadow: 0 14px 28px rgba(107, 68, 10, 0.12);
+}
+
+.rename-box.is-empty {
+  border-color: rgba(15, 66, 56, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: none;
+}
+
+.rename-box.is-ready {
+  border-color: rgba(216, 154, 56, 0.68);
 }
 
 .rename-box label,
@@ -202,6 +212,11 @@ h2 {
   padding: 0 12px;
   background: #fffdf7;
   color: #16332e;
+}
+
+.rename-box input:disabled {
+  color: #6f7c78;
+  opacity: 1;
 }
 
 .final-name {
