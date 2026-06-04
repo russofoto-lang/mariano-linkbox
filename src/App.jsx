@@ -209,6 +209,16 @@ export default function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!status) return undefined;
+
+    const timer = window.setTimeout(() => {
+      setStatus("");
+    }, 2000);
+
+    return () => window.clearTimeout(timer);
+  }, [status]);
+
   const canSelectFile = useMemo(() => token && !isUploading, [token, isUploading]);
   const finalUploadName = selectedFile ? buildUploadName(selectedFile.name, attachmentName) : "";
 
