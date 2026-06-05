@@ -23,6 +23,7 @@ const ATTACHMENTS_FOLDER = "BellaVita Calendario Allegati";
 const HISTORY_KEY = "bellavita-linkbox-history";
 const GOOGLE_AUTH_HINT_KEY = "bellavita-linkbox-google-auth";
 const FANTASTICAL_URL = "x-fantastical3://";
+const TOKEN_EXPIRY_SAFETY_MS = 60 * 1000;
 
 function readHistory() {
   try {
@@ -204,6 +205,10 @@ async function copyToClipboard(text) {
   }
 }
 
+function isUnauthorizedError(error) {
+  return error?.message?.includes("401") || error?.message?.toLowerCase().includes("unauthorized");
+}
+
 export default function App() {
   const [token, setToken] = useState("");
   const [history, setHistory] = useState(readHistory);
@@ -221,6 +226,8 @@ export default function App() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const hasRequestedSilentLoginRef = useRef(false);
   const tokenClientRef = useRef(null);
+  const pendingTokenRequestRef = useRef(null);
+  const tokenExpiresAtRef = useRef(0);
   const fileInputRef = useRef(null);
   const photoInputRef = useRef(null);
 
@@ -235,20 +242,32 @@ export default function App() {
         client_id: CLIENT_ID,
         scope: DRIVE_SCOPE,
         callback: (response) => {
-          if (response.access_token) {
+          const pendingRequest = pendingTokenRequestRef.current;
+          pendingTokenRequestRef.current = null;
+
+          if (response?.access_token) {
+            const expiresInMs = Number(response.expires_in || 3600) * 1000;
             setToken(response.access_token);
+            tokenExpiresAtRef.current = Date.now() + expiresInMs;
             localStorage.setItem(GOOGLE_AUTH_HINT_KEY, "yes");
             setError("");
             setStatus("Accesso Google completato.");
-          } else if (response.error) {
-            localStorage.removeItem(GOOGLE_AUTH_HINT_KEY);
+            pendingRequest?.resolve(response.access_token);
+          } else if (response?.error) {
+            tokenExpiresAtRef.current = 0;
+            pendingRequest?.reject(new Error(response.error_description || response.error));
           }
         }
       });
 
       if (!hasRequestedSilentLoginRef.current && localStorage.getItem(GOOGLE_AUTH_HINT_KEY) === "yes") {
         hasRequestedSilentLoginRef.current = true;
-        tokenClientRef.current.requestAccessToken({ prompt: "" });
+        requestGoogleAccessToken({ interactive: false })
+          .then(() => setStatus("Sessione Google ripristinata."))
+          .catch(() => {
+            setToken("");
+            tokenExpiresAtRef.current = 0;
+          });
       }
 
       return true;
@@ -282,13 +301,49 @@ export default function App() {
   const finalUploadName = selectedFile ? buildUploadName(selectedFile.name, attachmentName) : "";
   const terminalMode = error ? "error" : isUploading ? "uploading" : latestFile ? "done" : "idle";
 
+  function isTokenValid() {
+    return Boolean(token && Date.now() < tokenExpiresAtRef.current - TOKEN_EXPIRY_SAFETY_MS);
+  }
+
+  function requestGoogleAccessToken({ interactive }) {
+    return new Promise((resolve, reject) => {
+      if (!tokenClientRef.current) {
+        reject(new Error("Google Identity Services non è ancora pronto."));
+        return;
+      }
+
+      pendingTokenRequestRef.current = { resolve, reject };
+      tokenClientRef.current.requestAccessToken({
+        prompt: interactive ? "consent" : ""
+      });
+    });
+  }
+
+  async function getValidAccessToken({ interactive = false } = {}) {
+    if (isTokenValid()) return token;
+
+    try {
+      return await requestGoogleAccessToken({ interactive: false });
+    } catch (silentError) {
+      if (!interactive) {
+        throw silentError;
+      }
+
+      return requestGoogleAccessToken({ interactive: true });
+    }
+  }
+
   function signIn() {
     setError("");
     if (!isConfigured) {
       setError("Configura prima VITE_GOOGLE_CLIENT_ID nel file .env.");
       return;
     }
-    tokenClientRef.current?.requestAccessToken({ prompt: "consent" });
+    getValidAccessToken({ interactive: true }).catch((signInError) => {
+      setToken("");
+      tokenExpiresAtRef.current = 0;
+      setError(signInError.message || "Login Google non riuscito.");
+    });
   }
 
   function signOut() {
@@ -296,6 +351,7 @@ export default function App() {
       window.google.accounts.oauth2.revoke(token, () => {});
     }
     localStorage.removeItem(GOOGLE_AUTH_HINT_KEY);
+    tokenExpiresAtRef.current = 0;
     setToken("");
     setStatus("");
     setShowLogoutConfirm(false);
@@ -346,9 +402,24 @@ export default function App() {
 
     try {
       const fileForDrive = renameFile(selectedFile, finalUploadName);
-      const folderId = await findOrCreateFolder(token);
-      const uploaded = await uploadFileToDrive(fileForDrive, token, folderId);
-      await makeFileShareable(uploaded.id, token);
+      let accessToken = await getValidAccessToken({ interactive: true });
+      let uploaded;
+
+      try {
+        const folderId = await findOrCreateFolder(accessToken);
+        uploaded = await uploadFileToDrive(fileForDrive, accessToken, folderId);
+        await makeFileShareable(uploaded.id, accessToken);
+      } catch (driveError) {
+        if (!isUnauthorizedError(driveError)) throw driveError;
+
+        setToken("");
+        tokenExpiresAtRef.current = 0;
+        accessToken = await getValidAccessToken({ interactive: true });
+        const folderId = await findOrCreateFolder(accessToken);
+        uploaded = await uploadFileToDrive(fileForDrive, accessToken, folderId);
+        await makeFileShareable(uploaded.id, accessToken);
+      }
+
       setUploadProgress(100);
 
       const item = {
