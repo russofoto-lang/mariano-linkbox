@@ -6,7 +6,7 @@ import {
   ChevronRight,
   Copy,
   ExternalLink,
-  File,
+  File as FileIcon,
   FileText,
   FileUp,
   Image,
@@ -91,14 +91,6 @@ function buildUploadName(originalName, customName) {
   return `${customBase || splitFileName(originalName).base}${extension}`;
 }
 
-function renameFile(file, fileName) {
-  if (file.name === fileName) return file;
-  return new File([file], fileName, {
-    type: file.type,
-    lastModified: file.lastModified
-  });
-}
-
 function getFileKind(fileName = "") {
   const extension = splitFileName(fileName).extension.toLowerCase().replace(".", "");
 
@@ -116,7 +108,7 @@ function FileKindIcon({ name, size = 16 }) {
   if (kind === "pdf") return <FileText size={size} />;
   if (kind === "video") return <Video size={size} />;
   if (kind === "doc") return <FileText size={size} />;
-  return <File size={size} />;
+  return <FileIcon size={size} />;
 }
 
 async function driveRequest(path, token, options = {}) {
@@ -163,9 +155,9 @@ async function findOrCreateFolder(token) {
   return folder.id;
 }
 
-async function uploadFileToDrive(file, token, folderId) {
+async function uploadFileToDrive(file, token, folderId, fileName = file.name) {
   const metadata = {
-    name: file.name,
+    name: fileName,
     parents: [folderId]
   };
 
@@ -401,13 +393,12 @@ export default function App() {
     setStatus("Caricamento in corso...");
 
     try {
-      const fileForDrive = renameFile(selectedFile, finalUploadName);
       let accessToken = await getValidAccessToken({ interactive: true });
       let uploaded;
 
       try {
         const folderId = await findOrCreateFolder(accessToken);
-        uploaded = await uploadFileToDrive(fileForDrive, accessToken, folderId);
+        uploaded = await uploadFileToDrive(selectedFile, accessToken, folderId, finalUploadName);
         await makeFileShareable(uploaded.id, accessToken);
       } catch (driveError) {
         if (!isUnauthorizedError(driveError)) throw driveError;
@@ -416,7 +407,7 @@ export default function App() {
         tokenExpiresAtRef.current = 0;
         accessToken = await getValidAccessToken({ interactive: true });
         const folderId = await findOrCreateFolder(accessToken);
-        uploaded = await uploadFileToDrive(fileForDrive, accessToken, folderId);
+        uploaded = await uploadFileToDrive(selectedFile, accessToken, folderId, finalUploadName);
         await makeFileShareable(uploaded.id, accessToken);
       }
 
@@ -424,7 +415,7 @@ export default function App() {
 
       const item = {
         id: uploaded.id,
-        name: uploaded.name || fileForDrive.name,
+        name: uploaded.name || finalUploadName,
         link: uploaded.webViewLink || `https://drive.google.com/file/d/${uploaded.id}/view`,
         uploadedAt: uploaded.createdTime || new Date().toISOString()
       };
